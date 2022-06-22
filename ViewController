@@ -1,0 +1,40 @@
+import UIKit
+import CoreData
+
+class ViewController: UIViewController {
+    
+    
+    
+    var items = [Item]()
+    
+    //Core Data
+    
+    var container: NSPersistentContainer!
+    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+    
+    
+    
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        // Do any additional setup after loading the view.
+        getAllItem()
+    }
+    
+    //Core Data
+    func getAllItem(){
+        items = try! context.fetch(Item.fetchRequest())
+    }
+    
+    func saveItems(){
+        do {
+            try context.save()
+        } catch {
+            print("Saving Error")
+        }
+    }
+
+    
+    
+}
+
