@@ -1,30 +1,63 @@
 import UIKit
 import CoreData
 
-class ViewController: UIViewController {
+class CoreDataViewController: UIViewController {
     
+    @IBOutlet weak var label: UILabel!
     
+    @IBOutlet weak var textField: UITextField!
     
-    var items = [Item]()
+    @IBOutlet weak var logInButton: UIButton!
     
-    //Core Data
-    
-    var container: NSPersistentContainer!
-    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-    
-    
+    @IBAction func logInButtonPressed(_ sender: Any) {
+        
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        
+        let context = appDelegate.persistentContainer.viewContext
+        
+        let newName = NSEntityDescription.insertNewObject(forEntityName: "Name", into: context)
+        
+        newName.setValue(textField.text, forKey: "name")
+        
+        do {
+            try context.save()
+            label.text = textField.text
+        } catch {
+            print("Failed to save")
+        }
+            
+            
+        
+    }
     
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-        getAllItem()
+        
+        //CoreData Delegate
+        let appDelegate = UIApplication.shared.delegate as? AppDelegate
+        let context = appDelegate!.persistantContainer.viewContext
+        let request = NSFetchRequest<NSFetchRequestResult>(entityName:"Name")
+        request.returnsObjectsAsFaults = false
+        
+        do {
+        
+        let results = try context.fetch(request)
+        
+        for result in results as! [NSManagedObject]{
+         if let name = result.value(forKey:"name") as? String {
+          label.text = name
+        }
+        }
+        } catch {
+        print(error)
+        }
+       
     }
     
-    //Core Data
-    func getAllItem(){
-        items = try! context.fetch(Item.fetchRequest())
-    }
+    //Core Data Save//
+    
     
     func saveItems(){
         do {
