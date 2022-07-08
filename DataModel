@@ -1,18 +1,18 @@
-import UIKit
 import Foundation
 import CoreData
+import UIKit
 
 
-class Item: NSManagedObject {
+extension Name {
 
-    @nonobjc public class func fetchRequest() -> NSFetchRequest<Item> {
-        return NSFetchRequest<Item>(entityName: "Item")
+    @nonobjc public class func fetchRequest() -> NSFetchRequest<Name> {
+        return NSFetchRequest<Name>(entityName: "Name")
     }
 
-    @NSManaged public var item: UIImage?
+    @NSManaged public var name: String?
 
 }
 
-extension Item : Identifiable {
+extension Name : Identifiable {
 
 }
