@@ -1,0 +1,104 @@
+import UIKit
+import PhotosUI
+import CloudKit
+
+class ViewController: UIViewController,UIImagePickerControllerDelegate,UINavigationControllerDelegate,PHPickerViewControllerDelegate{
+    
+    
+    
+    var imagePicker: UIImagePickerController?
+    var imageAdded = false
+    
+    //CloudKit database
+    let database = CKContainer(identifier: "iCloud.cloudKit911").privateCloudDatabase
+    
+    
+    //imageView
+    @IBOutlet weak var imageView: UIImageView!
+    
+    @IBOutlet weak var loadImageView: UIImageView!
+    
+    //camera Button Tapped
+    @IBAction func cameraButtonTapped(_ sender: UIBarButtonItem) {
+        if imagePicker != nil{
+            imagePicker?.sourceType = .camera
+            present(imagePicker!, animated: true, completion: nil)
+        }
+    }
+    
+    
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        //imagePicker Delegate
+        imagePicker = UIImagePickerController()
+        imagePicker?.delegate = self
+        
+        
+        
+        
+    }
+    
+    //imagePickerController Delegate
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        if let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage{
+            imageView.image = image
+            imageAdded = true
+            let imageData = image.jpegData(compressionQuality: 1.0)
+            self.saveItem(item: imageData!)
+        }
+        dismiss(animated: true,completion: nil)
+    }
+
+    
+    @IBAction func saveButtonPressed(_ sender: UIButton) {
+        
+        if let imageData = imageView.image?.pngData(){
+            
+            DataBase.shareInstance.saveImage(data: imageData)
+        }
+        
+    }
+    //saveItem
+    func saveItem(item:Data){
+        let newItem = CKRecord(recordType: "Item")
+        newItem.setValue(item, forKey: "item")
+        
+        database.save(newItem){ newItem, error in
+            if newItem != nil,error == nil {
+                print("Saved")
+            }
+        }
+        
+        
+    }
+    
+    @IBAction func loadButtonPressed(_ sender: Any) {
+        
+        let arr = DataBase.shareInstance.loadImage()
+        
+       loadImageView.image = UIImage(data: arr[3].item!)
+    
+    }
+    
+    
+    
+    
+    //loadItem
+    func loadItem(){
+        let query = CKQuery(recordType: "Item", predicate: NSPredicate(value: true))
+        database.perform(query, inZoneWith: nil){ query, error in
+            if query != nil ,error == nil{
+                print("Loaded")
+            }
+ 
+            }
+    }
+    
+    func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+        
+    }
+    
+}
+
