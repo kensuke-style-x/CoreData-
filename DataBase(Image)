@@ -1,0 +1,46 @@
+import Foundation
+import UIKit
+import CoreData
+
+class DataBase {
+    
+    static let shareInstance = DataBase()
+    
+    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+    
+    func saveImage(data:Data){
+        
+        let imageInstance = Item(context: context)
+        imageInstance.item = data
+        
+        do {
+            
+            try context.save()
+            
+            print("Image is saved")
+        } catch {
+            
+            print(error.localizedDescription)
+        }
+        
+    }
+    
+    func loadImage() -> [Item] {
+        
+        var loadingImage = [Item]()
+        
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Item")
+        
+        do {
+            loadingImage = try context.fetch(fetchRequest) as! [Item]
+            
+        } catch {
+            print("Error loading Image")
+        }
+        
+        return loadingImage
+        
+    }
+    
+    
+}
